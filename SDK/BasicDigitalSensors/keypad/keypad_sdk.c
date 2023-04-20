@@ -141,7 +141,7 @@ int main() {
     gpio_set_pulls(columns[i], true, false);
   }
 
-  // Scan keypad every 10 miliseconds
+  // Scan keypad every 10 millseconds
   add_repeating_timer_ms(10, checkRow, NULL, &timer);
 
   // Main loop
