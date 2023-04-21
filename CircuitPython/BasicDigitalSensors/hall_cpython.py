@@ -21,6 +21,7 @@ class Stepper():
       raise ValueError("Must specify pins!")
     if len(pins) != 4:
       raise ValueError("There must be 4 pins")
+    self.pins = []
     for pin in pins:
         digPin = digitalio.DigitalInOut(pin)
         digPin.direction = digitalio.Direction.OUTPUT
@@ -64,10 +65,10 @@ class HallSensor:
     return self.elapsed
 
 # Stepper connections
-stepper = Stepper([2, 3, 4, 5])
+stepper = Stepper([board.GP2, board.GP3, board.GP4, board.GP5])
 
 # Sensor
-sensor = HallSensor(16)
+sensor = HallSensor(board.GP16)
 
 # LED
 led = digitalio.DigitalInOut(board.GP25)
