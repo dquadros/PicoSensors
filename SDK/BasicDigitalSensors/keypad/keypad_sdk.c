@@ -63,7 +63,7 @@ bool checkRow(struct repeating_timer *t) {
   gpio_set_dir (pin, true);
   gpio_put(pin, false);
 
-  // read rows and check for changes
+  // read columns and check for changes
   for (int col = 0; col < NCOLUMNS; col++) {
     uint32_t msk = 1u << columns[col];
     uint32_t read = gpio_get_all() & msk;

@@ -20,7 +20,7 @@ class Button {
       lastTime = millis();
     }
 
-  // Teste if Button is pressed
+  // Test if Button is pressed
   bool isPressed() {
     bool val = digitalRead(pinButton) == LOW;
     if (val != last) {

@@ -1,4 +1,4 @@
-# Sound Sensor Example
+# Gas Sensor Example
 
 import digitalio
 import board

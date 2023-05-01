@@ -42,7 +42,7 @@ void checkRow() {
   pinMode (pin, OUTPUT);
   digitalWrite(pin, LOW);
 
-  // read rows and check for changes
+  // read columns and check for changes
   for (int col = 0; col < NCOLUMNS; col++) {
     bool read = digitalRead (columns[col]) == LOW;
     if (read == previous[curRow][col]) {
