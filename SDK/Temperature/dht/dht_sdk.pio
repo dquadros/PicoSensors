@@ -1,0 +1,88 @@
+;
+; DHT protocol for 'Using Sensor with the Raspberry Pi Pico' book
+; Copyright (c) 2023, Daniel Quadros
+;
+
+.program dht
+
+    //wait for a start from the program
+    pull
+     
+    // keep data low for the time provided
+    set  pindirs, 1      // set pin to output  
+    set  pins, 0         // set pin low
+    mov  x, osr
+waitx:
+    nop  [25] 
+    jmp  x--, waitx      // wait for count*26/clock
+      
+    // starts reading response
+    set  pindirs, 0      // change pin to input
+    wait 1 pin 0         // wait for it to come back to high
+    wait 0 pin 0         // wait for starting pulse
+    wait 1 pin 0 
+    wait 0 pin 0         // wait for start of first bit
+ 
+    // read data bits
+readdata:
+    wait 1 pin 0         // wait for data high
+    set  x, 20           // x is timeout
+countdown:
+    jmp pin, continue    // continue conting if data high
+     
+    // pin low while counting -> bit 0
+    set  y, 0                 
+    in   y, 1            // put a 0 in result
+    jmp  readdata        // read next bit
+     
+    // pin still high
+continue:
+    jmp x--, countdown   // decrement count
+ 
+    // timeout -> bit 1
+    set  y, 1                  
+    in   y, 1            // put a 1 in the result
+    wait 0 pin 0         // wait for low
+    jmp  readdata        // read next bit
+
+
+% c-sdk {
+// Helper function to set a state machine to run our PIO program
+static inline void dht_program_init(PIO pio, uint sm, uint offset, 
+    uint dataPin) {
+
+    // Get an initialized config structure
+    pio_sm_config c = dht_program_get_default_config(offset);
+
+    // Map the state machine's pin groups
+    sm_config_set_set_pins(&c, dataPin, 1);
+    sm_config_set_in_pins(&c, dataPin);
+    sm_config_set_jmp_pin(&c, dataPin);
+    
+    // Set the pin direction at the PIO
+    pio_sm_set_consecutive_pindirs(pio, sm, dataPin, 1, true);
+
+    // Turn on pull up on data pin
+    gpio_pull_up(dataPin);
+    
+    // Make sure data is high at start
+    pio_sm_set_pins_with_mask(pio, sm, 1 << dataPin, 1);
+
+    // Set the pin GPIO function (connect PIO to the pad), 
+    pio_gpio_init(pio, dataPin);
+    
+    // Configure the FIFOs
+    sm_config_set_in_shift (&c, false, true, 8);
+    sm_config_set_out_shift (&c, true, false, 1);
+
+    // Configure the clock for 1.4 MHz
+    float div = clock_get_hz(clk_sys) / 1400000;
+    sm_config_set_clkdiv(&c, div);
+
+    // Load our configuration, and jump to the start of the program
+    pio_sm_init(pio, sm, offset, &c);
+    
+    // Set the state machine running
+    pio_sm_set_enabled(pio, sm, true);
+}
+%}
