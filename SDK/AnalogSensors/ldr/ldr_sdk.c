@@ -37,7 +37,7 @@ int main() {
     // Main loop
     while(1) {
       // Sleep for 3 to 60 seconds
-      uint delay = (rand() % 59000) + 3000;
+      uint delay = (rand() % 57000) + 3000;
       sleep_ms (delay);
       // Short beep if dark
       uint16_t val = adc_read(); // 0-4095
