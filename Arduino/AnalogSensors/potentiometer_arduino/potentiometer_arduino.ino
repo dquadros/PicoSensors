@@ -2,7 +2,9 @@
 
 // Pins
 #define PIN_SENSOR A0
+#if not defined(PIN_LED)
 #define PIN_LED    25
+#endif
 
 // Initialization
 void setup() {
